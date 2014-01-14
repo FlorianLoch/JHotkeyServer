@@ -52,6 +52,10 @@ public class ConnectionManager {
         //System.out.println("New connection from " + sckt.getRemoteSocketAddress() + " accepted.");
     }
     
+    public void removeConnection(Connection con) {
+        this.conns.remove(con);
+    }
+    
     private class PlainTCPConnectingThread extends Thread {
         private boolean run;
         private ServerSocket ssckt;
@@ -84,6 +88,7 @@ public class ConnectionManager {
                     }
                     else {
                         System.out.println("Rejected connection due to accept-only-local-connections policy.");
+                        sckt.close();
                     }
                 } catch (IOException ex) {
                     System.out.println("ServerSocket could not accept new connection! " + ex.toString());

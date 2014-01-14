@@ -15,6 +15,27 @@ public class ConnectionHelper {
     public static void processCommand(String cmd, Connection conn, ConnectionManager parent) {
         String inp = cmd.toLowerCase();
         
+        //If no authentification needed automaitcally set to authentificated state
+        if (!conn.isAuthorized() && parent.getHotkeyServer().getConf().getHashOfPw() == null) {
+            conn.setAuthorizedTrue();
+        }
+        
+        if (!conn.isAuthorized()) {
+            if (inp.startsWith("HELO") && inp.split(" ").length == 2) {
+                if (parent.getHotkeyServer().getConf().getHashOfPw().equals(inp.split(" ")[1])) {
+                    conn.setAuthorizedTrue();
+                }
+                else {
+                    conn.closeConnection("Not authentificated.");
+                    return;
+                }
+            }
+            else {
+                conn.closeConnection("Not authentificated.");
+                return;
+            }
+        }
+        
         if (inp.startsWith("register")) {
             String[] hotkeys = inp.substring(inp.indexOf(' ') + 1).split(",");
             String notRegisteredHotkeys = "";

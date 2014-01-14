@@ -103,10 +103,28 @@ public class WebsocketConnections extends WebSocketServer implements Connection 
     public String getRemoteAdress() {
         return this.currentWCD.getWebSocket().getRemoteSocketAddress().toString();
     }
+
+    @Override
+    public boolean isAuthorized() {
+        return this.currentWCD.getAuthorized();
+    }
+
+    @Override
+    public void setAuthorizedTrue() {
+        this.currentWCD.setAuthorized(true);
+    }
+
+    @Override
+    public void closeConnection(String reason) {
+        this.conns.remove(this.currentWCD);
+        this.sendString(reason);
+        this.currentWCD.getWebSocket().close(CloseFrame.REFUSE);
+    }
     
     private class WebsocketConnData {
         private WebSocket ws;
         private ArrayList<String> hotkeys;
+        private boolean authorized = false;
 
         public WebsocketConnData(WebSocket ws) {
             this.ws = ws;
@@ -131,6 +149,14 @@ public class WebsocketConnections extends WebSocketServer implements Connection 
             }
             
             return false;
+        }
+        
+        public boolean getAuthorized() {
+            return this.authorized;
+        }
+        
+        public void setAuthorized(boolean val) {
+            this.authorized = val;
         }
     }
 }

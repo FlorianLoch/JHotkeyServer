@@ -1,6 +1,8 @@
 <?xml>
 <settings>
-	<local-only>true</local-only>
+	<local-only>
+		true
+	</local-only>
 	<hotkeys>
 		<hotkey>
 			<name>

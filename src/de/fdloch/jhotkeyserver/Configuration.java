@@ -71,6 +71,16 @@ public class Configuration {
         }
     }
     
+    //Returns null if there is no passwort or if an error due to corrupted xml file happened
+    public String getHashOfPw() {
+        try {
+            XMLNode node = this.rootNode.getChildNodesByType("passcode")[0];
+            return SHA1.makeHash(node.getValue());
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+    
     public ArrayList<KeyValue<String, String>> getHotkeys() {
         try {
             ArrayList<KeyValue<String, String>> res = new ArrayList<KeyValue<String, String>>();

@@ -22,4 +22,10 @@ public interface Connection {
     
     public String getRemoteAdress();
     
+    public boolean isAuthorized();
+    
+    public void setAuthorizedTrue();
+    
+    public void closeConnection(String reason);
+    
 }

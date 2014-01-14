@@ -22,6 +22,7 @@ import java.util.Iterator;
 public class PlainTCPConnection extends EventSocket implements Connection {
     private HashSet<String> registeredHotkeys;
     private ConnectionManager parent;
+    private boolean authorized = false;
     
     public PlainTCPConnection(Socket sckt, ConnectionManager parent) throws IOException {
         super(sckt);
@@ -68,6 +69,27 @@ public class PlainTCPConnection extends EventSocket implements Connection {
     @Override
     public void registerNewHotkey(String hotkey) {
         this.registeredHotkeys.add(hotkey);
+    }
+
+    @Override
+    public boolean isAuthorized() {
+       return this.authorized;
+    }
+
+    @Override
+    public void setAuthorizedTrue() {
+        this.authorized = true;
+    }
+
+    @Override
+    public void closeConnection(String reason) {
+        this.sendString(reason);
+        this.parent.removeConnection(this);
+        try {
+            this.sckt.close();
+        } catch (IOException ex) {
+            //
+        }
     }
     
 }
