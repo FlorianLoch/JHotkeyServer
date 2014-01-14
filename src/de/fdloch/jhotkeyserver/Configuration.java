@@ -72,12 +72,16 @@ public class Configuration {
     }
     
     //Returns null if there is no passwort or if an error due to corrupted xml file happened
-    public String getHashOfPw() {
+    public String getHashOfPw(String nonce) {
         try {
             XMLNode node = this.rootNode.getChildNodesByType("passcode")[0];
-            return SHA1.makeHash(node.getValue());
+            return SHA1.makeHash(node.getValue() + nonce);
         } catch (Exception ex) {
-            return null;
+            try {
+                return SHA1.makeHash(nonce);
+            } catch (Exception ex1) {
+                return null;
+            }
         }
     }
     

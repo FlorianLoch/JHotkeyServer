@@ -6,6 +6,8 @@
 
 package de.fdloch.jhotkeyserver.network;
 
+import de.fdloch.jhotkeyserver.SHA1;
+
 /**
  *
  * @author Florian
@@ -15,20 +17,20 @@ public class ConnectionHelper {
     public static void processCommand(String cmd, Connection conn, ConnectionManager parent) {
         String inp = cmd.toLowerCase();
         
-        //If no authentification needed automaitcally set to authentificated state
-        if (!conn.isAuthorized() && parent.getHotkeyServer().getConf().getHashOfPw() == null) {
-            conn.setAuthorizedTrue();
-        }
-        
         if (!conn.isAuthorized()) {
-            if (inp.startsWith("HELO") && inp.split(" ").length == 2) {
-                if (parent.getHotkeyServer().getConf().getHashOfPw().equals(inp.split(" ")[1])) {
-                    conn.setAuthorizedTrue();
-                }
-                else {
-                    conn.closeConnection("Not authentificated.");
-                    return;
-                }
+            String nonce = conn.getNonce();
+            String received = "";
+            
+            if (inp.startsWith("helo") && inp.split(" ").length == 2) {
+                received = inp.split(" ")[1];
+            }
+            else {
+                conn.closeConnection("Not authentificated.");
+                return;
+            }
+            
+            if (parent.getHotkeyServer().getConf().getHashOfPw(nonce).equalsIgnoreCase(received)) {
+                conn.setAuthorizedTrue();
             }
             else {
                 conn.closeConnection("Not authentificated.");
@@ -69,6 +71,18 @@ public class ConnectionHelper {
         else {
             conn.sendString("REGISTERED BUT " + notRegisteredHotkeys + " IS/ARE UNKNOWN!\n");
         }
+    }
+    
+    public static String sendNonce(Connection conn) {
+        String nonce = generateNonce();
+        
+        conn.sendString("HELO " + nonce);
+        
+        return nonce;
+    }
+        
+    private static String generateNonce() {
+        
     }
     
 }

@@ -23,11 +23,14 @@ public class PlainTCPConnection extends EventSocket implements Connection {
     private HashSet<String> registeredHotkeys;
     private ConnectionManager parent;
     private boolean authorized = false;
+    private String nonce;
     
     public PlainTCPConnection(Socket sckt, ConnectionManager parent) throws IOException {
         super(sckt);
         this.parent = parent;
         this.registeredHotkeys = new HashSet<String>();
+        
+        this.nonce = ConnectionHelper.sendNonce(this);
     }
     
     @Override
@@ -90,6 +93,11 @@ public class PlainTCPConnection extends EventSocket implements Connection {
         } catch (IOException ex) {
             //
         }
+    }
+
+    @Override
+    public String getNonce() {
+        return this.nonce;
     }
     
 }

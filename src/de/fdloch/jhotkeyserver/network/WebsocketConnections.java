@@ -33,8 +33,11 @@ public class WebsocketConnections extends WebSocketServer implements Connection 
     @Override
     public void onOpen(WebSocket ws, ClientHandshake ch) {
         if ((this.parent.getHotkeyServer().getConf().isLocalConnectiosOnly() && (ws.getRemoteSocketAddress().getAddress().isAnyLocalAddress() || ws.getRemoteSocketAddress().getAddress().isLoopbackAddress())) || (!this.parent.getHotkeyServer().getConf().isLocalConnectiosOnly())) {
-            this.conns.add(new WebsocketConnData(ws));
-            System.out.println("New Websocket-Connection from " + ws.getRemoteSocketAddress() + ".");
+            this.currentWCD = new WebsocketConnData(ws);
+            this.conns.add(currentWCD);
+            String nonce = ConnectionHelper.sendNonce(this);
+            this.currentWCD.setNonce(nonce);
+            System.out.println("New Websocket-Connection from " + ws.getRemoteSocketAddress() + ". Nonce has been sent.");
         }
         else {
             ws.close(CloseFrame.REFUSE);
@@ -120,11 +123,17 @@ public class WebsocketConnections extends WebSocketServer implements Connection 
         this.sendString(reason);
         this.currentWCD.getWebSocket().close(CloseFrame.REFUSE);
     }
+
+    @Override
+    public String getNonce() {
+        return this.currentWCD.getNonce();
+    }
     
     private class WebsocketConnData {
         private WebSocket ws;
         private ArrayList<String> hotkeys;
         private boolean authorized = false;
+        private String nonce;
 
         public WebsocketConnData(WebSocket ws) {
             this.ws = ws;
@@ -157,6 +166,14 @@ public class WebsocketConnections extends WebSocketServer implements Connection 
         
         public void setAuthorized(boolean val) {
             this.authorized = val;
+        }
+        
+        public String getNonce() {
+            return this.nonce;
+        }
+        
+        public void setNonce(String nonce) {
+            this.nonce = nonce;
         }
     }
 }

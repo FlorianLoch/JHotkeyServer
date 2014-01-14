@@ -28,4 +28,6 @@ public interface Connection {
     
     public void closeConnection(String reason);
     
+    public String getNonce();
+    
 }
