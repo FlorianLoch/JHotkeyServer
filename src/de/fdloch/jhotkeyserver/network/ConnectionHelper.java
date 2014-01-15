@@ -31,8 +31,11 @@ public class ConnectionHelper {
             
             if (parent.getHotkeyServer().getConf().getHashOfPw(nonce).equalsIgnoreCase(received)) {
                 conn.setAuthorizedTrue();
+                conn.sendString("AUTH OK");
             }
             else {
+                System.out.println("Received:" + received);
+                System.out.println("Expected:" + parent.getHotkeyServer().getConf().getHashOfPw(nonce));
                 conn.closeConnection("Not authentificated.");
                 return;
             }
@@ -55,7 +58,7 @@ public class ConnectionHelper {
             
             System.out.println("REGISTER command from " + conn.getRemoteAdress() + " received and processed: " + inp);
         }
-        else {
+        else if (!inp.startsWith("helo")) {
             conn.sendString("COMMAND '" + inp + "' UNKNOWN!\n");
         }        
     }
@@ -82,7 +85,7 @@ public class ConnectionHelper {
     }
         
     private static String generateNonce() {
-        
+        return "tmp";
     }
     
 }

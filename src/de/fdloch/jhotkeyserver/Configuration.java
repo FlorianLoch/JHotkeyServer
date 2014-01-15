@@ -75,9 +75,11 @@ public class Configuration {
     public String getHashOfPw(String nonce) {
         try {
             XMLNode node = this.rootNode.getChildNodesByType("passcode")[0];
+            System.out.println("Raw: " + node.getValue() + nonce);
             return SHA1.makeHash(node.getValue() + nonce);
         } catch (Exception ex) {
             try {
+                System.out.println("Raw: " + nonce);
                 return SHA1.makeHash(nonce);
             } catch (Exception ex1) {
                 return null;

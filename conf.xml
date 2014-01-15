@@ -1,5 +1,8 @@
 <?xml>
 <settings>
+	<passcode>
+		6472
+	</passcode>
 	<local-only>
 		true
 	</local-only>
