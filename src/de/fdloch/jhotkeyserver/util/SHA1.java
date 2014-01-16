@@ -1,4 +1,4 @@
-package de.fdloch.jhotkeyserver; //Hier sollte der (korrekte) Name des Packages stehen, wird keines verwendet, so kann diese Zeile gelöscht werden
+package de.fdloch.jhotkeyserver.util; //Hier sollte der (korrekte) Name des Packages stehen, wird keines verwendet, so kann diese Zeile gelöscht werden
 
 /**
  * Diese Klasse bietet die Möglichkeit auf einfache Art und Weise den Hash-Wert eines Strings zu berrechnen.

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package de.fdloch.jhotkeyserver;
+package de.fdloch.jhotkeyserver.conf;
 
 /**
  *

@@ -6,12 +6,19 @@
 
 package de.fdloch.jhotkeyserver;
 
+import de.fdloch.jhotkeyserver.conf.KeyValue;
+import de.fdloch.jhotkeyserver.conf.Configuration;
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 import de.fdloch.jhotkeyserver.network.ConnectionManager;
 import java.awt.AWTException;
+import java.awt.Menu;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,6 +51,27 @@ public class JHotkeyServer implements HotkeyListener {
         SystemTray tray = SystemTray.getSystemTray();
         this.trayIcon = new TrayIcon(ImageIO.read(new File("S:\\EIGENE DATEIEN\\Eigene Entwicklung\\JAVA SE\\JHotkeyServer\\addon_icon64x64.png")));
         this.trayIcon.setImageAutoSize(true);
+        
+        PopupMenu popup = new PopupMenu();
+        MenuItem mIQuit = new MenuItem("Quit");
+        mIQuit.addActionListener(new ActionListener() {
+            private JHotkeyServer parent;
+            
+            public ActionListener init(JHotkeyServer parent) {
+                this.parent = parent;
+                
+                return this;
+            }
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                this.parent.exit();
+            }
+        }.init(this));
+        
+        popup.add(mIQuit);
+        
+        this.trayIcon.setPopupMenu(popup);
         tray.add(this.trayIcon);
         
         this.hotkeys = new ArrayList<String>();
@@ -99,6 +127,11 @@ public class JHotkeyServer implements HotkeyListener {
         
         
         if (hotkey.equalsIgnoreCase("quit")) {
+            this.exit();
+        }
+    }
+ 
+    public void exit() {
             JIntellitype.getInstance().cleanUp();
             
             try {
@@ -107,10 +140,9 @@ public class JHotkeyServer implements HotkeyListener {
                 System.out.println(ex);
             }
             
-            System.exit(0);
-        }
+            System.exit(0);        
     }
- 
+    
     public Configuration getConf() {
         return this.conf;
     }

@@ -6,7 +6,7 @@
 
 package de.fdloch.jhotkeyserver.network;
 
-import de.fdloch.jhotkeyserver.SHA1;
+import de.fdloch.jhotkeyserver.util.SHA1;
 
 /**
  *

@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-package de.fdloch.jhotkeyserver;
+package de.fdloch.jhotkeyserver.conf;
 
+import de.fdloch.jhotkeyserver.util.SHA1;
 import de.fdloch.jsimplexml.xml.XMLNode;
 import de.fdloch.jsimplexml.xml.XMLParser;
 import de.fdloch.jsimplexml.xml.XMLUtils;
