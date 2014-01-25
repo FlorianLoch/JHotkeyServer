@@ -6,13 +6,13 @@
 
 package de.fdloch.jhotkeyserver;
 
-import de.fdloch.jhotkeyserver.conf.KeyValue;
 import de.fdloch.jhotkeyserver.conf.Configuration;
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
+import de.fdloch.jhotkeyserver.conf.HotkeyEntry;
 import de.fdloch.jhotkeyserver.network.ConnectionManager;
+import de.fdloch.jsimplexml.util.KeyValue;
 import java.awt.AWTException;
-import java.awt.Menu;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
@@ -33,7 +33,6 @@ public class JHotkeyServer implements HotkeyListener {
     public static int PORT_WEBSOCKET = 28883;
     
     private TrayIcon trayIcon;
-    private ArrayList<String> hotkeys;
     private ConnectionManager conMan;
     private Configuration conf;
     
@@ -74,8 +73,6 @@ public class JHotkeyServer implements HotkeyListener {
         this.trayIcon.setPopupMenu(popup);
         tray.add(this.trayIcon);
         
-        this.hotkeys = new ArrayList<String>();
-        
         JIntellitype.getInstance().addHotKeyListener(this);
         this.registerHotkeys();
         
@@ -83,51 +80,40 @@ public class JHotkeyServer implements HotkeyListener {
     }
     
     public boolean isNameRegisteredHotkey(String name) {
-        name = name.toLowerCase();
-        
-        for (String str : this.hotkeys) {
-            if (str.equals(name)) {
-                return true;
-            }
-        }
-        
-        return false;
+        return this.conf.isNameRegisteredHotkey(name);
     }
     
     private void registerHotkeys() {
-        ArrayList<KeyValue<String, String>> hotkeyList = this.conf.getHotkeys();
+        JIntellitype.getInstance().cleanUp();
         
-        if (hotkeyList != null) {
-            for (KeyValue<String, String> kV : hotkeyList) {
-                this.registerHotkey(kV.getKey(), kV.getValue());
-            }
+        int i = 0;
+        while (i < this.conf.getHotkeys().size()) {
+            HotkeyEntry entry = this.conf.getHotkeys().get(i);
+            this.registerHotkey(i, entry.getName(), entry.getCombination());
+            
+            i++;
         }
     }
     
-    private void registerHotkey(String name, String modifierAndKeyCode) {
-        JIntellitype.getInstance().registerHotKey(this.hotkeys.size(), modifierAndKeyCode);
-        this.hotkeys.add(name.toLowerCase());
+    private void registerHotkey(int id, String name, String modifierAndKeyCode) {
+        JIntellitype.getInstance().registerHotKey(id, modifierAndKeyCode);
     }
 
-    private void addNewHotkey(String name, String modifierAndKeyCode) {
-        this.conf.addHotkeyBinding(new KeyValue<String, String>(name, modifierAndKeyCode));
-        registerHotkey(name, modifierAndKeyCode);
+    private void addNewHotkey(String name, String modifierAndKeyCode, boolean trayPopup) {
+        this.conf.addHotkeyBinding(new HotkeyEntry(name, modifierAndKeyCode, trayPopup));
+        
+        this.registerHotkey(this.conf.getHotkeys().size(), name, modifierAndKeyCode);
     }
     
     @Override
     public void onHotKey(int i) {
-        String hotkey = this.hotkeys.get(i);
+        HotkeyEntry hotkey = this.conf.getHotkeys().get(i);
         
-        this.conMan.propagateHotkeyPressed(hotkey);
-        System.out.println(hotkey + " pressed!");
+        this.conMan.propagateHotkeyPressed(hotkey.getName());
+        System.out.println(hotkey.getName() + " pressed!");
         
-        if (this.conf.isDispalyMessageActiveForKey(hotkey)) {
-            this.trayIcon.displayMessage("Hotkey pressed!", "\"" + hotkey + "\" has been pressed!", TrayIcon.MessageType.INFO);
-        }
-        
-        
-        if (hotkey.equalsIgnoreCase("quit")) {
-            this.exit();
+        if (hotkey.isTrayPopup()) {
+            this.trayIcon.displayMessage("Hotkey pressed!", "\"" + hotkey.getName() + "\" has been pressed!", TrayIcon.MessageType.INFO);
         }
     }
  

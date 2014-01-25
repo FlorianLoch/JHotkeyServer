@@ -8,13 +8,14 @@ package de.fdloch.jhotkeyserver.gui;
 
 import de.fdloch.jhotkeyserver.conf.Configuration;
 import de.fdloch.jhotkeyserver.conf.HotkeyEntry;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.HeadlessException;
-import java.awt.ScrollPane;
-import java.awt.TextField;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 
 /**
  *
@@ -33,6 +34,7 @@ public class HotkeyEditorFrame extends JFrame {
         
         this.buildFrame(hotkeys);
         
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setBounds(10, 10, 300, 500);
         this.setVisible(true);
     }
@@ -44,21 +46,32 @@ public class HotkeyEditorFrame extends JFrame {
     private void buildFrame(ArrayList<HotkeyEntry> hotkeys) {
         this.setLayout(new FlowLayout());
         
-        ScrollPane sPane = new ScrollPane();
-        sPane.setSize(300, 500);
+
         JPanel pnl = new JPanel();
         pnl.setLayout(null);
-        sPane.add(pnl);
+        JScrollPane sPane = new JScrollPane(pnl);
+        sPane.setPreferredSize(new Dimension(600, 500));
+        //sPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         this.add(sPane);
         
         int heightOffset = 0;
+        
+        int i = 0;
+        while (i < 20) {
         for (HotkeyEntry hotkey : hotkeys) {
-            TextField tfName = new TextField(hotkey.getName());
-            tfName.setBounds(0, heightOffset, 50, 20);
+            JTextField tfName = new JTextField(hotkey.getName());
+            tfName.setBounds(0, heightOffset, 100, 20);
             
             pnl.add(tfName);
             
             heightOffset += 25;
+            
+            pnl.setPreferredSize(new Dimension(600, heightOffset));
+        }
+        
+        pnl.revalidate();
+        pnl.repaint();
+            i++;
         }
     } 
     

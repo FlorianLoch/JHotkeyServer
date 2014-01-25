@@ -7,30 +7,6 @@
 		true
 	</local-only>
 	<hotkeys>
-		<hotkey>
-			<name>
-				TMP
-			</name>
-			<comb>
-				WIN+P
-			</comb>
-		</hotkey>
-		<hotkey>
-			<name>
-				TEST
-			</name>
-			<comb>
-				WIN+SHIFT+U
-			</comb>
-		</hotkey>
-		<hotkey>
-			<name>
-				QUIT
-			</name>
-			<comb>
-				WIN+SHIFT+Q
-			</comb>
-		</hotkey>
 		<hotkey tray-popup="true">
 			<name>
 				PAUSE-PLAY
