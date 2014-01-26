@@ -41,7 +41,7 @@ public class ConnectionHelper {
             }
         }
         
-        if (inp.startsWith("register")) {
+        if (inp.startsWith("subscribe")) {
             String[] hotkeys = inp.substring(inp.indexOf(' ') + 1).split(",");
             String notRegisteredHotkeys = "";
             
@@ -55,6 +55,19 @@ public class ConnectionHelper {
             }
             
             sendAcknowledgement(conn, notRegisteredHotkeys);
+            
+            System.out.println("SUBSCRIBE command from " + conn.getRemoteAdress() + " received and processed: " + inp);
+        }
+        else if (inp.startsWith("register")) {
+            String[] blocks = inp.split(" ");
+            String requester = blocks[1].substring(1, blocks[1].length() - 2);
+            String[] hotkeys = blocks[2].split(",");
+            
+            for (String hotkey : hotkeys) {
+                conn.registerNewHotkey(hotkey); //Register these hotkeys for the connection - if the user does not accept the hotkey-request they will not be propagated to it does not matter whether the hotkeys are listed in the connection or not
+                
+                parent.getHotkeyServer().requestForNewHotkey(hotkey);
+            }
             
             System.out.println("REGISTER command from " + conn.getRemoteAdress() + " received and processed: " + inp);
         }

@@ -105,6 +105,10 @@ public class JHotkeyServer implements HotkeyListener {
         this.registerHotkey(this.conf.getHotkeys().size(), name, modifierAndKeyCode);
     }
     
+    public void requestForNewHotkey(String key) {
+        
+    }
+    
     @Override
     public void onHotKey(int i) {
         HotkeyEntry hotkey = this.conf.getHotkeys().get(i);
