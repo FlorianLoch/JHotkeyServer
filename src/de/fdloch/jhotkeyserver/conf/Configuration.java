@@ -24,6 +24,7 @@ public class Configuration {
     private File confFile;
     private boolean fileLoaded = false;
     private XMLNode rootNode = null;
+    private ArrayList<HotkeyEntry> hotkeysCache;
 
     public Configuration(File confFile) throws FileNotFoundException {
         if (confFile.exists()) {
@@ -47,6 +48,8 @@ public class Configuration {
             return false;
         }
 
+        this._getHotkeys();
+        
         this.fileLoaded = true;
         return true;
     }
@@ -88,6 +91,10 @@ public class Configuration {
     }
 
     public ArrayList<HotkeyEntry> getHotkeys() {
+        return this.hotkeysCache;
+    }
+    
+    private void _getHotkeys() {
         try {
             ArrayList<HotkeyEntry> res = new ArrayList<HotkeyEntry>();
             XMLNode hotkeysNode = this.rootNode.getChildNodesByType("hotkeys")[0];
@@ -100,9 +107,9 @@ public class Configuration {
                 res.add(new HotkeyEntry(name.getValue(), combination.getValue(), node.getParameter("tray-popup").equalsIgnoreCase("true")));
             }
 
-            return res;
+            this.hotkeysCache = res;
         } catch (Exception ex) {
-            return null;
+            this.hotkeysCache = null;
         }
     }
 
@@ -126,6 +133,8 @@ public class Configuration {
                     } else {
                         node.removeParameter("tray-popup");
                     }
+                    
+                    this._getHotkeys();
 
                     return true;
                 }
@@ -156,6 +165,8 @@ public class Configuration {
             return false;
         }
 
+        this._getHotkeys();
+        
         return true;
     }
 
@@ -171,6 +182,8 @@ public class Configuration {
             for (XMLNode node : hotkeys) {
                 if (node.getChildNodesByType("name")[0].getValue().equalsIgnoreCase(key)) {
                     hotkeysNode.removeChild(node);
+                    
+                    this._getHotkeys();
                     return true;
                 }
             }

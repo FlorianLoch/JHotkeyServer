@@ -28,6 +28,7 @@ import javax.swing.JTextField;
 public class HotkeyEditorFrame extends JFrame {
 
     private Configuration conf;
+    private int heightOffset;
     
     public HotkeyEditorFrame(Configuration conf) throws HeadlessException {
         this.conf = conf;
@@ -47,6 +48,10 @@ public class HotkeyEditorFrame extends JFrame {
         new HotkeyEditorFrame(null);
     }
     
+    private void saveHotkeySettings() {
+        
+    }
+    
     private void buildFrame(ArrayList<HotkeyEntry> hotkeys) {
         this.setLayout(new FlowLayout());
        
@@ -63,42 +68,88 @@ public class HotkeyEditorFrame extends JFrame {
         int y = (this.getToolkit().getScreenSize().height / 2) - (600 / 2);
         this.setBounds(x, y, 620, 600);
         this.setResizable(false);
+           
+        heightOffset = 5;
         
-        
-        int heightOffset = 5;
-        
-        for (HotkeyEntry hotkey : hotkeys) {
-            HotkeySettingsPanel hKPnl = new HotkeySettingsPanel(hotkey);
-            hKPnl.setBounds(0, heightOffset, 600, 20);
-            
-            hKPnl.addActionListenerToRemoveBtn(new ActionListener() {
-                private JPanel jPnl_grandparent;
-                private HotkeySettingsPanel hSP_parent;
-
-                public ActionListener init(JPanel jPnl_parent, HotkeySettingsPanel hSP) {
-                    this.jPnl_grandparent = jPnl_parent;
-                    this.hSP_parent = hSP;
-                    
-                    return this;
-                }
-            
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    this.jPnl_grandparent.remove(this.hSP_parent);
-                    pnl.revalidate();
-                    pnl.repaint();
-                }         
-            }.init(pnl, hKPnl));
-            
-            pnl.add(hKPnl);
+        for (HotkeyEntry hotkey : hotkeys) {         
+            this.addHotkeySettingsPanel(hotkey, pnl);
             
             heightOffset += 25;
-            
-            pnl.setPreferredSize(new Dimension(600, heightOffset));
         }
         
+        JButton jBtn_addNew = new JButton("Register new hotkey");
+        jBtn_addNew.addActionListener(new ActionListener() {
+            private HotkeyEditorFrame parent;
+            
+            public ActionListener init(HotkeyEditorFrame parent) {
+                this.parent = parent;
+                
+                return this;
+            }
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                this.parent.addHotkeySettingsPanel(null, pnl);
+                
+                heightOffset += 25;
+            }
+        }.init(this));
+        
+        JButton jBtn_cancel = new JButton("Cancel");
+        jBtn_cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+                
+                getContentPane().removeAll();
+            }
+        });
+        
+        JButton jBtn_save = new JButton("Save");
+        jBtn_save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveHotkeySettings();
+                
+                //setVisible(false);
+                
+                getContentPane().removeAll();
+            }
+        });
+        
+        this.add(jBtn_addNew);
+        this.add(jBtn_cancel);
+        this.add(jBtn_save);
+    } 
+
+    public void addHotkeySettingsPanel(HotkeyEntry hotkey, JPanel pnl) {
+        HotkeySettingsPanel hKPnl = new HotkeySettingsPanel(hotkey, false);
+        hKPnl.setBounds(0, heightOffset, 600, 20);
+
+        hKPnl.addActionListenerToRemoveBtn(new ActionListener() {
+            private JPanel jPnl_grandparent;
+            private HotkeySettingsPanel hSP_parent;
+
+            public ActionListener init(JPanel jPnl_parent, HotkeySettingsPanel hSP) {
+                this.jPnl_grandparent = jPnl_parent;
+                this.hSP_parent = hSP;
+
+                return this;
+            }
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                this.jPnl_grandparent.remove(this.hSP_parent);
+                jPnl_grandparent.revalidate();
+                jPnl_grandparent.repaint();
+            }         
+        }.init(pnl, hKPnl));      
+        
+        pnl.add(hKPnl);
+        
+        pnl.setPreferredSize(new Dimension(600, heightOffset));
         pnl.revalidate();
         pnl.repaint();
-    } 
+    }
     
 }
