@@ -56,7 +56,7 @@ public class HotkeyEditorFrame extends JFrame {
         this.setLayout(new FlowLayout());
        
         final JPanel pnl = new JPanel();
-        pnl.setLayout(null);
+        pnl.setLayout(new ListLayout(0, 5, 5));
        
         JScrollPane sPane = new JScrollPane(pnl);
         sPane.setPreferredSize(new Dimension(600, 500));
@@ -124,7 +124,7 @@ public class HotkeyEditorFrame extends JFrame {
 
     public void addHotkeySettingsPanel(HotkeyEntry hotkey, JPanel pnl) {
         HotkeySettingsPanel hKPnl = new HotkeySettingsPanel(hotkey, false);
-        hKPnl.setBounds(0, heightOffset, 600, 20);
+        hKPnl.setPreferredSize(new Dimension(600, 20));
 
         hKPnl.addActionListenerToRemoveBtn(new ActionListener() {
             private JPanel jPnl_grandparent;
@@ -147,7 +147,6 @@ public class HotkeyEditorFrame extends JFrame {
         
         pnl.add(hKPnl);
         
-        pnl.setPreferredSize(new Dimension(600, heightOffset));
         pnl.revalidate();
         pnl.repaint();
     }

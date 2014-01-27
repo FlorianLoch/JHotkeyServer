@@ -6,6 +6,7 @@
 package de.fdloch.jhotkeyserver.gui;
 
 import de.fdloch.jhotkeyserver.conf.HotkeyEntry;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -105,6 +106,8 @@ public class HotkeySettingsPanel extends JPanel {
         this.jBtn_remove = new JButton("Remove");
         this.jBtn_remove.setBounds(450, 0, 120, 20);
 
+        this.setPreferredSize(new Dimension(570, 20));
+        
         this.add(this.jTF_name);
         this.add(this.jTF_combination);
         this.add(this.jChkbx_popup);
