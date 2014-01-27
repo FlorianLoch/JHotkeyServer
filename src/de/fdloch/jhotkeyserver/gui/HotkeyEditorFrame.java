@@ -6,8 +6,10 @@
 
 package de.fdloch.jhotkeyserver.gui;
 
+import de.fdloch.jhotkeyserver.JHotkeyServer;
 import de.fdloch.jhotkeyserver.conf.Configuration;
 import de.fdloch.jhotkeyserver.conf.HotkeyEntry;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.HeadlessException;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -27,35 +30,58 @@ import javax.swing.JTextField;
  */
 public class HotkeyEditorFrame extends JFrame {
 
+    private JHotkeyServer main;
     private Configuration conf;
-    private int heightOffset;
+    private JPanel pnl;
     
-    public HotkeyEditorFrame(Configuration conf) throws HeadlessException {
-        this.conf = conf;
-        
-        ArrayList<HotkeyEntry> hotkeys = new ArrayList<HotkeyEntry>();
-        hotkeys.add(new HotkeyEntry("Pause", "Win+A", true));
-        hotkeys.add(new HotkeyEntry("Play", "Win+P", false));
-        
-        this.buildFrame(hotkeys);
-        
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //this.setBounds(10, 10, 300, 500);
-        this.setVisible(true);
+    public static void show(JHotkeyServer main) {
+        new HotkeyEditorFrame(main).setVisible(true);
     }
     
-    public static void main(String[] args) {
-        new HotkeyEditorFrame(null);
+    public HotkeyEditorFrame(JHotkeyServer main) throws HeadlessException {
+        this.main = main;
+        this.conf = main.getConf();
+        
+        this.buildFrame(this.conf.getHotkeys());
+        
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
     
-    private void saveHotkeySettings() {
+    private boolean saveHotkeySettings() {
+        boolean somethingChanged = false;
         
+        for (Component com : this.pnl.getComponents()) {
+            if (com instanceof HotkeySettingsPanel) {
+                HotkeySettingsPanel hKSP = (HotkeySettingsPanel) com;
+                
+                if (hKSP.isNew()) {
+                    this.conf.addHotkeyBinding(hKSP.getSettings());
+                    
+                    somethingChanged = true;
+                }
+                else if (hKSP.isModified()) {
+                    this.conf.updateHotkeyBinding(hKSP.getOrigName(), hKSP.getSettings());
+                
+                    somethingChanged = true;
+                }
+            }
+        }
+        
+        if (somethingChanged) {
+            try {
+                this.conf.write();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Could not save configuration - sorry for that!");
+            }
+        }
+        
+        return somethingChanged;
     }
     
     private void buildFrame(ArrayList<HotkeyEntry> hotkeys) {
         this.setLayout(new FlowLayout());
        
-        final JPanel pnl = new JPanel();
+        this.pnl = new JPanel();
         pnl.setLayout(new ListLayout(0, 5, 5));
        
         JScrollPane sPane = new JScrollPane(pnl);
@@ -63,18 +89,14 @@ public class HotkeyEditorFrame extends JFrame {
         sPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         
         this.add(sPane);
-        System.out.println(this.getHeight() - this.getContentPane().getHeight());
+
         int x = (this.getToolkit().getScreenSize().width / 2) - (620 / 2); 
         int y = (this.getToolkit().getScreenSize().height / 2) - (600 / 2);
         this.setBounds(x, y, 620, 600);
         this.setResizable(false);
-           
-        heightOffset = 5;
         
         for (HotkeyEntry hotkey : hotkeys) {         
             this.addHotkeySettingsPanel(hotkey, pnl);
-            
-            heightOffset += 25;
         }
         
         JButton jBtn_addNew = new JButton("Register new hotkey");
@@ -89,9 +111,7 @@ public class HotkeyEditorFrame extends JFrame {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                this.parent.addHotkeySettingsPanel(null, pnl);
-                
-                heightOffset += 25;
+                this.parent.addHotkeySettingsPanel(null, pnl, true);
             }
         }.init(this));
         
@@ -109,9 +129,13 @@ public class HotkeyEditorFrame extends JFrame {
         jBtn_save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                saveHotkeySettings();
+                boolean somethingChanged = saveHotkeySettings();
                 
-                //setVisible(false);
+                if (somethingChanged) {
+                    main.refreshBindings();
+                }
+                
+                setVisible(false);
                 
                 getContentPane().removeAll();
             }
@@ -123,7 +147,11 @@ public class HotkeyEditorFrame extends JFrame {
     } 
 
     public void addHotkeySettingsPanel(HotkeyEntry hotkey, JPanel pnl) {
-        HotkeySettingsPanel hKPnl = new HotkeySettingsPanel(hotkey, false);
+        this.addHotkeySettingsPanel(hotkey, pnl, false);
+    }
+    
+    public void addHotkeySettingsPanel(HotkeyEntry hotkey, JPanel pnl, boolean newFlag) {
+        HotkeySettingsPanel hKPnl = new HotkeySettingsPanel(hotkey, newFlag);
         hKPnl.setPreferredSize(new Dimension(600, 20));
 
         hKPnl.addActionListenerToRemoveBtn(new ActionListener() {

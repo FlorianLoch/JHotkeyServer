@@ -94,7 +94,7 @@ public class HotkeySettingsPanel extends JPanel {
         this.jTF_combination.addKeyListener(changeListener);
 
         this.jChkbx_popup = new JCheckBox("Show popup when hotkey pressed");
-        this.jChkbx_popup.setSelected(false);
+        this.jChkbx_popup.setSelected((hotkey == null) ? false : hotkey.isTrayPopup());
         this.jChkbx_popup.setBounds(215, 0, 230, 20);
         this.jChkbx_popup.addActionListener(new ActionListener() {
             @Override

@@ -15,5 +15,21 @@
 				WIN+A
 			</comb>
 		</hotkey>
+		<hotkey>
+			<name>
+				Baum
+			</name>
+			<comb>
+				Win+B
+			</comb>
+		</hotkey>
+		<hotkey tray-popup="true">
+			<name>
+				Quit
+			</name>
+			<comb>
+				WIN+C
+			</comb>
+		</hotkey>
 	</hotkeys>
 </settings>

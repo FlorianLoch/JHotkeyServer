@@ -10,8 +10,8 @@ import de.fdloch.jhotkeyserver.conf.Configuration;
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 import de.fdloch.jhotkeyserver.conf.HotkeyEntry;
+import de.fdloch.jhotkeyserver.gui.HotkeyEditorFrame;
 import de.fdloch.jhotkeyserver.network.ConnectionManager;
-import de.fdloch.jsimplexml.util.KeyValue;
 import java.awt.AWTException;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
@@ -21,7 +21,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 /**
@@ -35,6 +34,7 @@ public class JHotkeyServer implements HotkeyListener {
     private TrayIcon trayIcon;
     private ConnectionManager conMan;
     private Configuration conf;
+    private int lastTimeRegisteredHotkeys = 0;
     
     /**
      * @param args the command line arguments
@@ -44,6 +44,9 @@ public class JHotkeyServer implements HotkeyListener {
     }
 
     public JHotkeyServer() throws IOException, AWTException {
+        JIntellitype.getInstance().addHotKeyListener(this);
+        System.out.println("JIntellitype.dll successfully loaded.");
+        
         this.conf = new Configuration(new File("conf.xml"));
         this.conf.load();
         
@@ -68,12 +71,29 @@ public class JHotkeyServer implements HotkeyListener {
             }
         }.init(this));
         
+        MenuItem mIHotkeys = new MenuItem("Edit hotkey bindings");
+        mIHotkeys.addActionListener(new ActionListener() {
+            private JHotkeyServer parent;
+            
+            public ActionListener init(JHotkeyServer parent) {
+                this.parent = parent;
+                
+                return this;
+            }
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                HotkeyEditorFrame.show(this.parent);
+            }
+        }.init(this));        
+        
+        popup.add(mIHotkeys);
+        popup.addSeparator();
         popup.add(mIQuit);
         
         this.trayIcon.setPopupMenu(popup);
         tray.add(this.trayIcon);
         
-        JIntellitype.getInstance().addHotKeyListener(this);
         this.registerHotkeys();
         
         this.conMan = new ConnectionManager(PORT_PLAIN_TCP, PORT_WEBSOCKET, this);
@@ -83,9 +103,16 @@ public class JHotkeyServer implements HotkeyListener {
         return this.conf.isNameRegisteredHotkey(name);
     }
     
-    private void registerHotkeys() {
-        JIntellitype.getInstance().cleanUp();
+    public void refreshBindings() {
+        //Unregsiter all current hotkeys
+        for (int i = 0; i <= this.lastTimeRegisteredHotkeys; i++) {
+            JIntellitype.getInstance().unregisterHotKey(i);
+        }
         
+        this.registerHotkeys();
+    }
+    
+    private void registerHotkeys() {      
         int i = 0;
         while (i < this.conf.getHotkeys().size()) {
             HotkeyEntry entry = this.conf.getHotkeys().get(i);
@@ -93,6 +120,8 @@ public class JHotkeyServer implements HotkeyListener {
             
             i++;
         }
+        
+        this.lastTimeRegisteredHotkeys = i;
     }
     
     private void registerHotkey(int id, String name, String modifierAndKeyCode) {
@@ -122,15 +151,15 @@ public class JHotkeyServer implements HotkeyListener {
     }
  
     public void exit() {
-            JIntellitype.getInstance().cleanUp();
-            
-            try {
-                this.conf.write();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-            
-            System.exit(0);        
+        JIntellitype.getInstance().cleanUp();
+
+        try {
+            this.conf.write();
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+
+        System.exit(0);        
     }
     
     public Configuration getConf() {

@@ -18,13 +18,11 @@ import java.util.ArrayList;
  */
 public class ListLayout implements LayoutManager {
 
-    private ArrayList<Component> comps;
-    private int leftMargin;
-    private int topMargin;
-    private int vGap;
+    private final int leftMargin;
+    private final int topMargin;
+    private final int vGap;
 
     public ListLayout(int leftMargin, int topMargin, int vGap) {
-        this.comps = new ArrayList<Component>();
         this.leftMargin = leftMargin;
         this.topMargin = topMargin;
         this.vGap = vGap;
