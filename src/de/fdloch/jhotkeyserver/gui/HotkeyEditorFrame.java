@@ -38,6 +38,17 @@ public class HotkeyEditorFrame extends JFrame {
         new HotkeyEditorFrame(main).setVisible(true);
     }
     
+    public static void showAndAddNew(JHotkeyServer main, String[] keys) {
+        HotkeyEditorFrame hKEF = new HotkeyEditorFrame(main);
+        
+        for (String key : keys) {
+            hKEF.addHotkeySettingsPanel(new HotkeyEntry(key, "", false), hKEF.getPanel(), true);
+        }
+        
+        hKEF.setVisible(true);
+        hKEF.toFront();
+    }
+    
     public HotkeyEditorFrame(JHotkeyServer main) throws HeadlessException {
         this.main = main;
         this.conf = main.getConf();
@@ -76,6 +87,10 @@ public class HotkeyEditorFrame extends JFrame {
         }
         
         return somethingChanged;
+    }
+    
+    public JPanel getPanel() {
+        return this.pnl;
     }
     
     private void buildFrame(ArrayList<HotkeyEntry> hotkeys) {

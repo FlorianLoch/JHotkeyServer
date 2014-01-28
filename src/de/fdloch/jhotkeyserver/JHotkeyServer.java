@@ -22,6 +22,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -128,14 +129,28 @@ public class JHotkeyServer implements HotkeyListener {
         JIntellitype.getInstance().registerHotKey(id, modifierAndKeyCode);
     }
 
-    private void addNewHotkey(String name, String modifierAndKeyCode, boolean trayPopup) {
-        this.conf.addHotkeyBinding(new HotkeyEntry(name, modifierAndKeyCode, trayPopup));
+    public boolean requestForNewHotkey(String application, String[] keys) {
+        String hotkeysToRegister = joinArray(keys, ", ");
         
-        this.registerHotkey(this.conf.getHotkeys().size(), name, modifierAndKeyCode);
+        int res = JOptionPane.showConfirmDialog(null, "The application \"" + application + "\" wants to add the following hotkeys: " + hotkeysToRegister + ".\nDo you confirm this?", "JHotkeyServer", JOptionPane.YES_NO_OPTION);
+        
+        if (res == JOptionPane.OK_OPTION) {
+            HotkeyEditorFrame.showAndAddNew(this, keys);
+            
+            return true;
+        }
+        
+        return false;
     }
     
-    public void requestForNewHotkey(String key) {
+    public static String joinArray(String[] ar, String glue) {
+        String res = "";
         
+        for (int i = 0; i < ar.length; i++) {
+            res += ar[i] + ((i + 1 < ar.length) ? glue : "");
+        }
+        
+        return res;
     }
     
     @Override

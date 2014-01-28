@@ -9,10 +9,10 @@
 	<hotkeys>
 		<hotkey tray-popup="true">
 			<name>
-				PAUSE-PLAY
+				pause-play
 			</name>
 			<comb>
-				WIN+A
+				WIN+SHIFT+A
 			</comb>
 		</hotkey>
 		<hotkey>
@@ -29,6 +29,27 @@
 			</name>
 			<comb>
 				WIN+C
+			</comb>
+		</hotkey>
+		<hotkey>
+			<name>
+				test
+			</name>
+			<comb>
+			</comb>
+		</hotkey>
+		<hotkey>
+			<name>
+				forward
+			</name>
+			<comb>
+			</comb>
+		</hotkey>
+		<hotkey>
+			<name>
+				rewind
+			</name>
+			<comb>
 			</comb>
 		</hotkey>
 	</hotkeys>

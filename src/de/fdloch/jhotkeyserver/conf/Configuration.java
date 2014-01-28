@@ -220,10 +220,8 @@ public class Configuration {
 //    }
 
     public boolean isNameRegisteredHotkey(String name) {
-        name = name.toLowerCase();
-
         for (HotkeyEntry entry : this.getHotkeys()) {
-            if (entry.getName().equals(name)) {
+            if (entry.getName().equalsIgnoreCase(name)) {
                 return true;
             }
         }
