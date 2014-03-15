@@ -48,32 +48,24 @@ public class JHotkeyServer implements HotkeyListener {
         JIntellitype.getInstance().addHotKeyListener(this);
         System.out.println("JIntellitype.dll successfully loaded.");
         
-        this.conf = new Configuration(new File("conf.xml"));
+        this.conf = new Configuration(new File(System.getenv("APPDATA") + "/jhotkeyserver/conf.xml"));
         this.conf.load();
         
         SystemTray tray = SystemTray.getSystemTray();
-        this.trayIcon = new TrayIcon(ImageIO.read(new File("S:\\EIGENE DATEIEN\\Eigene Entwicklung\\JAVA SE\\JHotkeyServer\\addon_icon64x64.png")));
+        this.trayIcon = new TrayIcon(ImageIO.read(getClass().getResourceAsStream("/de/fdloch/jhotkeyserver/icon64x64.png")));
         this.trayIcon.setImageAutoSize(true);
         
         PopupMenu popup = new PopupMenu();
         MenuItem mIQuit = new MenuItem("Quit");
         mIQuit.addActionListener(new ActionListener() {
-            private JHotkeyServer parent;
-            
-            public ActionListener init(JHotkeyServer parent) {
-                this.parent = parent;
-                
-                return this;
-            }
-            
             @Override
             public void actionPerformed(ActionEvent e) {
-                this.parent.exit();
+                exit();
             }
-        }.init(this));
+        });
         
         MenuItem mIHotkeys = new MenuItem("Edit hotkey bindings");
-        mIHotkeys.addActionListener(new ActionListener() {
+        ActionListener editHotkeysMenuItemListener = new ActionListener() {
             private JHotkeyServer parent;
             
             public ActionListener init(JHotkeyServer parent) {
@@ -86,13 +78,15 @@ public class JHotkeyServer implements HotkeyListener {
             public void actionPerformed(ActionEvent e) {
                 HotkeyEditorFrame.show(this.parent);
             }
-        }.init(this));        
+        }.init(this);
+        mIHotkeys.addActionListener(editHotkeysMenuItemListener);        
         
         popup.add(mIHotkeys);
         popup.addSeparator();
         popup.add(mIQuit);
-        
+          
         this.trayIcon.setPopupMenu(popup);
+        this.trayIcon.addActionListener(editHotkeysMenuItemListener);
         tray.add(this.trayIcon);
         
         this.registerHotkeys();
